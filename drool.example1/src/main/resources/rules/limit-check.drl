@@ -1,0 +1,44 @@
+package com.digital.demo.drool.example1.rules.limitcheck
+
+import com.digital.demo.drool.example1.entity.PaymentTransaction
+import com.digital.demo.drool.example1.entity.PaymentStatus
+import java.math.BigDecimal
+
+rule "Check Insufficient Funds"
+    when
+        $payment: PaymentTransaction(customerBalance < amount, status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.INSUFFICIENT_FUNDS);
+        $payment.setFailureReason("Insufficient funds in account");
+        System.out.println("Limit check: Insufficient funds");
+end
+
+rule "Check Daily Transaction Limit"
+    when
+        $payment: PaymentTransaction(
+            dailyTransactionTotal + amount > new BigDecimal("10000"),
+            status == PaymentStatus.PENDING
+        )
+    then
+        $payment.setStatus(PaymentStatus.LIMIT_EXCEEDED);
+        $payment.setFailureReason("Daily transaction limit exceeded");
+        System.out.println("Limit check: Daily transaction limit exceeded");
+end
+
+rule "Check Monthly Transaction Count"
+    when
+        $payment: PaymentTransaction(customerTransactionCount >= 100, status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.LIMIT_EXCEEDED);
+        $payment.setFailureReason("Monthly transaction count limit exceeded");
+        System.out.println("Limit check: Monthly transaction count limit exceeded");
+end
+
+rule "Check Large Transaction Amount"
+    when
+        $payment: PaymentTransaction(amount > new BigDecimal("50000"), status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.FRAUD_REVIEW);
+        $payment.setFailureReason("Large transaction amount requires review");
+        System.out.println("Limit check: Large transaction amount flagged for review");
+end

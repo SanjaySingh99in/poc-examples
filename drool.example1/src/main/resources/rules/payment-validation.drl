@@ -1,0 +1,35 @@
+package com.digital.demo.drool.example1.rules.paymentvalidation
+
+import com.digital.demo.drool.example1.entity.PaymentTransaction
+import com.digital.demo.drool.example1.entity.PaymentStatus
+import java.math.BigDecimal
+
+rule "Validate Positive Amount"
+    when
+        $payment: PaymentTransaction(amount <= 0)
+    then
+        $payment.setStatus(PaymentStatus.FAILED);
+        $payment.setFailureReason("Amount must be greater than zero");
+        System.out.println("Payment validation failed: Amount must be greater than zero");
+end
+
+rule "Validate Same Account"
+    when
+        $payment: PaymentTransaction(fromAccount == toAccount)
+    then
+        $payment.setStatus(PaymentStatus.FAILED);
+        $payment.setFailureReason("Cannot transfer to the same account");
+        System.out.println("Payment validation failed: Cannot transfer to same account");
+end
+
+rule "Validate Account Numbers"
+    when
+        $payment: PaymentTransaction(
+            fromAccount == null || fromAccount.trim().isEmpty() ||
+            toAccount == null || toAccount.trim().isEmpty()
+        )
+    then
+        $payment.setStatus(PaymentStatus.FAILED);
+        $payment.setFailureReason("Invalid account numbers");
+        System.out.println("Payment validation failed: Invalid account numbers");
+end

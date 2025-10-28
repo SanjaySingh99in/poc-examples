@@ -1,0 +1,34 @@
+/**
+ * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
+ */
+public enum {{classname}} {
+    {{#allowableValues}}
+    {{#enumVars}}
+    {{name}}({{#value}}{{dataType}}.valueOf({{{value}}}){{/value}}{{^value}}null{{/value}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+    {{/enumVars}}
+    {{/allowableValues}}
+
+    private {{{dataType}}} value;
+
+    {{classname}}({{{dataType}}} value) {
+        this.value = value;
+    }
+
+    public {{{dataType}}} getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static {{classname}} fromValue({{{dataType}}} value) {
+        for ({{classname}} e : {{classname}}.values()) {
+            if (e.value.equals(value)) {
+                return e;
+            }
+        }
+        return null;
+    }
+}

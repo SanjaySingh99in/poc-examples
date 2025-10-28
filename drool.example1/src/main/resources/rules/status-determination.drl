@@ -1,0 +1,60 @@
+package com.digital.demo.drool.example1.rules.statusdetermination
+
+import com.digital.demo.drool.example1.entity.PaymentTransaction
+import com.digital.demo.drool.example1.entity.PaymentStatus
+import java.time.LocalDateTime
+
+rule "Approve Standard Payment"
+    when
+        $payment: PaymentTransaction(
+            status == PaymentStatus.PENDING,
+            customerBalance >= amount,
+            dailyTransactionTotal + amount <= new BigDecimal("10000"),
+            customerTransactionCount < 100,
+            isHighRiskCountry == false,
+            isSuspiciousAmount == false,
+            !(customerRiskLevel == "HIGH" && amount > new BigDecimal("1000"))
+        )
+    then
+        $payment.setStatus(PaymentStatus.PROCESSING);
+        $payment.setProcessedDate(LocalDateTime.now());
+        System.out.println("Status determination: Payment approved for processing");
+end
+
+rule "Complete Small Payment Immediately"
+    when
+        $payment: PaymentTransaction(
+            status == PaymentStatus.PROCESSING,
+            amount <= new BigDecimal("1000"),
+            transactionType == "DOMESTIC"
+        )
+    then
+        $payment.setStatus(PaymentStatus.COMPLETED);
+        $payment.setCustomerBalance($payment.getCustomerBalance().subtract($payment.getAmount()));
+        System.out.println("Status determination: Small domestic payment completed immediately");
+end
+
+rule "Flag International Payment for Review"
+    when
+        $payment: PaymentTransaction(
+            status == PaymentStatus.PENDING,
+            transactionType == "INTERNATIONAL"
+        )
+    then
+        $payment.setStatus(PaymentStatus.FRAUD_REVIEW);
+        $payment.setFailureReason("International payment requires additional verification");
+        System.out.println("Status determination: International payment flagged for review");
+end
+
+rule "Process Premium Customer Payment Faster"
+    when
+        $payment: PaymentTransaction(
+            status == PaymentStatus.PROCESSING,
+            customerRiskLevel == "LOW",
+            amount <= new BigDecimal("5000")
+        )
+    then
+        $payment.setStatus(PaymentStatus.COMPLETED);
+        $payment.setCustomerBalance($payment.getCustomerBalance().subtract($payment.getAmount()));
+        System.out.println("Status determination: Premium customer payment completed");
+end

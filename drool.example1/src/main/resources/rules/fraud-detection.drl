@@ -1,0 +1,44 @@
+package com.digital.demo.drool.example1.rules.frauddetection
+
+import com.digital.demo.drool.example1.entity.PaymentTransaction
+import com.digital.demo.drool.example1.entity.PaymentStatus
+import java.math.BigDecimal
+
+rule "Detect High Risk Country Transaction"
+    when
+        $payment: PaymentTransaction(isHighRiskCountry == true, status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.FRAUD_REVIEW);
+        $payment.setFailureReason("Transaction to high-risk country requires review");
+        System.out.println("Fraud detection: High-risk country transaction flagged for review");
+end
+
+rule "Detect Suspicious Amount Pattern"
+    when
+        $payment: PaymentTransaction(isSuspiciousAmount == true, status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.FRAUD_REVIEW);
+        $payment.setFailureReason("Suspicious amount pattern detected");
+        System.out.println("Fraud detection: Suspicious amount pattern detected");
+end
+
+rule "Detect Round Amount Fraud Pattern"
+    when
+        $payment: PaymentTransaction(
+            amount.remainder(new BigDecimal("1000")).compareTo(BigDecimal.ZERO) == 0,
+            amount > new BigDecimal("5000"),
+            status == PaymentStatus.PENDING
+        )
+    then
+        $payment.setIsSuspiciousAmount(true);
+        System.out.println("Fraud detection: Round amount pattern detected");
+end
+
+rule "High Risk Customer Transaction"
+    when
+        $payment: PaymentTransaction(customerRiskLevel == "HIGH", amount > new BigDecimal("1000"), status == PaymentStatus.PENDING)
+    then
+        $payment.setStatus(PaymentStatus.FRAUD_REVIEW);
+        $payment.setFailureReason("High-risk customer transaction requires review");
+        System.out.println("Fraud detection: High-risk customer transaction flagged");
+end
