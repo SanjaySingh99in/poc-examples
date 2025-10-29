@@ -11,10 +11,10 @@ public class PaymentRequestDTO {
     @NotNull(message = "Customer ID is required")
     private String customerId;
 
-    @NotNull(message = "From account is required")
+//    @NotNull(message = "From account is required")
     private String fromAccount;
 
-    @NotNull(message = "To account is required")
+//    @NotNull(message = "To account is required")
     private String toAccount;
 
     @NotNull(message = "Amount is required")

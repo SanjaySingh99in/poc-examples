@@ -23,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
         customer1.setCustomerId("CUST001");
         customer1.setName("John Doe");
         customer1.setEmail("john.doe@email.com");
-        customer1.setAccountBalance(new BigDecimal("10000.00"));
+        customer1.setAccountBalance(new BigDecimal("10.00"));
         customer1.setRiskLevel("LOW");
 
         Customer customer2 = new Customer();

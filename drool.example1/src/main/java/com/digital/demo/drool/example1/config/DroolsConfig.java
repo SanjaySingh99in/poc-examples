@@ -23,8 +23,8 @@ public class DroolsConfig {
 
         // Load all DRL files from resources/rules directory
         kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "payment-validation.drl"));
-//        kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "fraud-detection.drl"));
-//        kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "limit-check.drl"));
+        kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "fraud-detection.drl"));
+        kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "limit-check.drl"));
 //        kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + "status-determination.drl"));
 
         KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
